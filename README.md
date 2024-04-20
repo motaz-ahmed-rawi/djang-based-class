@@ -1,1 +1,1 @@
-# djang-based-class
+# django-based-class
