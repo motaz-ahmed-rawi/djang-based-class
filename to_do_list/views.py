@@ -1,57 +1,96 @@
-from django.shortcuts import render,redirect
-from django.views import View
-from django.views.generic import ListView,CreateView,DetailView,UpdateView
-from .models import User,Note
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
+from django.http import Http404
+from .models import User, Note
+import uuid
+import hashlib
+from django.utils import timezone
 
+def user_data(request):
+    return request.session.get('user_id')
 
+def generate_random_hashed_id():
+    random_uuid = uuid.uuid4()
+    hashed_id = hashlib.sha256(str(random_uuid).encode()).hexdigest()
+    return hashed_id
 
 class index(ListView):
-    model=Note
+    model = Note
+    template_name = 'to_do_list/note_list.html'
 
-# class  create_note(LoginRequiredMixin, CreateView):
-#     login_url = '/login/'
-#     # redirect to the login page if user is not logged in
-#     template_name='notes/create_note.html'
-#     success_url="/notes"
-#     fields=['title','content']
-    
-#     def form_valid(self,form):
-#         note=form.save(commit=False)
-#         note.author=self.request.user
-#         note.save()
-#         return super().form_valid(form)
-        
+    def get_queryset(self):
+        user_id = user_data(self.request)
+        if user_id:
+            return Note.objects.filter(user=user_id)
+        else:
+            return redirect('login')
+
+class CreateNewNote(CreateView):
+    model = Note
+    template_name = 'to_do_list/note_create.html'
+    success_url = '/to-do/notes'
+    fields = ['title', 'content', 'user']
+
+    def form_valid(self, form):
+        form.instance.hashed_id = generate_random_hashed_id()
+        return super().form_valid(form)
+
+class update_note(UpdateView):
+    model = Note
+    fields = ["title", "content"]
+    template_name = 'to_do_list/note_update.html'
+
+    def form_valid(self, form):
+        form.instance.updated_at = timezone.now()
+        return super().form_valid(form)
+
+    def get_object(self, queryset=None):
+        hashed_id = self.kwargs.get('hashed_id')
+        return get_object_or_404(Note, hashed_id=hashed_id)
+
+    def get_success_url(self):
+        return '/to-do/notes'
+
+class ModelDeleteView(DeleteView):
+    model = Note
+    success_url = "/to-do/notes"
+
+    def get_object(self, queryset=None):
+        hashed_id = self.kwargs.get('hashed_id')
+        return get_object_or_404(Note, hashed_id=hashed_id)
 
 class ModelDetailView(DetailView):
     model = Note
     
+    def get_object(self, queryset=None):
+        hashed_id = self.kwargs.get('hashed_id')
+        note = get_object_or_404(Note, hashed_id=hashed_id)
+        user_id_from_session = self.request.session.get('user_id')
+        
+        if user_id_from_session == note.user_id:
+            return note
+        else:
+            return redirect('login')
 
-class update_note(UpdateView):
-    model=Note
-    fields=["title","content"]
-    template_name='to_do_list/note_update.html'
-
-    def get_success_url(self):
-        obj=self.object
-        id=obj.id
-        return f"/to-do/notes"
-    
 class signup(CreateView):
-    model=User
-    template_name='to_do_list\signup.html'
-    fields = ['name','last_name','email','password']
-    success_url= 'login'
+    model = User
+    template_name = 'to_do_list/signup.html'
+    fields = ['name', 'last_name', 'email', 'password']
+    success_url = 'login'
 
 def login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        user = User.objects.filter(email=email).first()  # Get the user object if it exists
+        user = User.objects.filter(email=email, password=password).first()
         
-        if user and user.password == password:
-            # Password matches
+        if user:
+            request.session['user_id'] = user.id
             return redirect('/to-do/notes')
         else:
-            # Either user doesn't exist or password is incorrect
             return render(request, 'to_do_list/login.html', {'error': "Invalid email or password!"})
     return render(request, 'to_do_list/login.html')
+
+def logout(request):
+    request.session.clear()
+    return redirect('login')

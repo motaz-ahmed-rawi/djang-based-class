@@ -24,6 +24,9 @@ class Note(models.Model):
     content=models.TextField()
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     date=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+    hashed_id = models.CharField(max_length=64, unique=True,null=True)
+
 
     
 
@@ -36,3 +39,10 @@ class Note(models.Model):
 
     def get_absolute_url(self):
         return reverse("Note_detail", kwargs={"pk": self.pk})
+
+
+
+
+
+
+
