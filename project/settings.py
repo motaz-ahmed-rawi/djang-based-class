@@ -31,6 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    
+    "crispy_forms",
+    "crispy_bootstrap5",
     'accounts.apps.AccountsConfig',
     'post.apps.PostConfig',
     'to_do_list.apps.ToDoListConfig',
@@ -41,6 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -122,7 +128,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT= os.path.join(BASE_DIR,'static')  # static files will be served from here
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "django-based-class/static"),
+    os.path.join(BASE_DIR, "/static"),
 ]
 MEDIA_ROOT =  os.path.join(BASE_DIR,"media")   # <-- absolute path to the media directory on your server
 
@@ -133,3 +139,8 @@ MEDIA_URL= '/media/'                          # <-- URL that handles
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGOUT_REDIRECT_URL='/login'
+LOGIN_REDIRECT_URL='/to-do/notes'
+

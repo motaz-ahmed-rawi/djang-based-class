@@ -1,12 +1,14 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 
 urlpatterns = [
-    path('logout', views.logout, name='logout'),
-    path('login',views.login,name='login'),
-    path('',views.signup.as_view(),name='index'),
+    path('',views.index.as_view(),name='index'),
+
     path('notes',views.index.as_view(),name='notes'),
     path('<str:hashed_id>',views.ModelDetailView.as_view(),name='details'),
     path('create/', views.CreateNewNote.as_view(), name='create'),

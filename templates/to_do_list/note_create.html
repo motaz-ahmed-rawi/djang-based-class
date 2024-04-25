@@ -15,7 +15,7 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="form-group">
-                        <input type="hidden" name="user" id="user" value="{{request.session.user_id}}">
+                        <input type="hidden" name="user" id="user" value="{{user.id}}">
                         <label for="id_title">Title:</label>
                         <input type="text" class="form-control" id="id_title" name="title" >
                     </div>
