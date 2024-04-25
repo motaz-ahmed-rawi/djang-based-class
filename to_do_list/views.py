@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.http import Http404
-from .models import Note
+from .models import Note,Status
 import uuid
 import hashlib
 from django.utils import timezone
@@ -30,16 +30,21 @@ class CreateNewNote(LoginRequiredMixin,CreateView):
     model = Note
     template_name = 'to_do_list/note_create.html'
     success_url = '/to-do/notes'
-    fields = ['title', 'content', 'user']
+    fields = ['title', 'content', 'user','status']
 
     def form_valid(self, form):
         form.instance.hashed_id = generate_random_hashed_id()
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status_choices'] = Status.objects.all()
+        return context
 
 class update_note(LoginRequiredMixin,UpdateView):
     login_url='login'
     model = Note
-    fields = ["title", "content"]
+    fields = ["title", "content","status"]
     template_name = 'to_do_list/note_update.html'
 
     def form_valid(self, form):

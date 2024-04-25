@@ -11,6 +11,10 @@
     />
   </head>
   <body>
+
+
+
+
     <a href="{% url 'logout' %}">Logout</a>
     {{user.id}}
     <div class="container mt-5">
@@ -28,14 +32,62 @@
             </div>
 
           </div>
-            {% for note in note_list %}
 
-          <ul id="todoList" class="list-group">
-            <!-- Todos will be added here dynamically -->
-            <a href="{{note.hashed_id}}" class="list-group-item list-group-item-action ">
-            {{ note.title }} <span>{{note.date}}</span></a>
+
+
+
+          <div class="bg-dark p-5">
+            {% for note in note_list %}
+                {% if note.status.id == 1 %}
+                    <ul id="todoList" class="list-group mt-2">
+                        <li class="list-group-item list-group-item-action">
+                            <a href="{{ note.hashed_id }}">
+                                {{ note.title }} <span>{{ note.date }}</span>
+                                <span>{{ note.status }}</span>
+                            </a>
+                        </li>
+                    </ul>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+
+          <div class="bg-danger p-5">
+            
+            {% for note in note_list %}
+            {% if note.status.id == 2 %}
+            <ul id="todoList" class="list-group mt-2">
+              <li class="list-group-item list-group-item-action">
+                  <a href="{{ note.hashed_id }}">
+                      {{ note.title }} <span>{{ note.date }}</span>
+                      <span>{{ note.status }}</span>
+                  </a>
+              </li>
           </ul>
-        {% endfor %}
+          {%endif%}
+          {% endfor %}
+        </div>
+
+          <div class="bg-success p-5">
+            {% for note in note_list %}
+             {% if note.status.id == 3 %}
+
+             <ul id="todoList" class="list-group mt-2">
+              <li class="list-group-item list-group-item-action">
+                  <a href="{{ note.hashed_id }}">
+                      {{ note.title }} <span>{{ note.date }}</span>
+                       <span>{{ note.status }}</span>
+                  </a>
+              </li>
+          </ul>
+          {% endif %}
+          {% endfor %}
+        </div>
+
+
+
+        
+        
 
         </div>
       </div>
